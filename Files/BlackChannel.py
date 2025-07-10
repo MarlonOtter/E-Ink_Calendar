@@ -1,16 +1,19 @@
 # BlackChannel.py
 # This generates the black channel of the calendar image
 # Author: Marlon Otter
-# Date (dd-mm-yyy): 09-07-2025
+# Date (dd-mm-yyy): 10-07-2025
 
 
 from PIL import Image,ImageDraw
 import calendar as cal
+import os
+import datetime as dt
 
-from CalendarUtils import FORMAT, WEEKDAYFONT, ALLDAYS, DATE, REDONLY_WEATHER, _CalendarPosition, _DrawCalendarBox
+from CalendarUtils import FORMAT, WEEKDAYFONT, ALLDAYS, REDONLY_WEATHER, _CalendarPosition, _DrawCalendarBox
 
 BLACK = 0
 WHITE = 255
+DATE = dt.datetime.today()
 
 # Define the image 
 image = Image.new("1", (800, 480), WHITE)
@@ -24,12 +27,13 @@ def AddCalendarBoxes():
 
     boxSize = [size[0]//7 - padding*2, size[1]//6 - padding*2]
 
-    for i in range(daysInMonth):
+    for i in range(0, daysInMonth):
         # If the day is today then don't draw the box in black as it will be hidden by the red
-        if i == DATE.day: 
+        if i+1 == DATE.day: 
             continue
 
         # Calculate the position of the box
+        # For some reason has to be 0-indexed for the day not sure why
         pos = _CalendarPosition(DATE.year, DATE.month, i)  
         # Then Draw the box at that location
         _DrawCalendarBox(imageDraw, pos, WHITE, BLACK, i+1)
@@ -59,7 +63,7 @@ def AddWeather(weatherCode:str):
         return
     
     # Get the icon
-    weatherIcon = Image.open(f"Assets/Weather/{weatherCode[:-1]}d@4xB.png")
+    weatherIcon = Image.open(os.path.join(os.path.dirname(__file__), "Assets", "Weather", f"{weatherCode[:-1]}d@4xB.png"))
 
     pos = FORMAT["sideBox"]["pos"]
     size = FORMAT["sideBox"]["size"]
@@ -76,6 +80,11 @@ def AddWeather(weatherCode:str):
 
 
 def Draw(weatherCode:str):
+    #Reset the images
+    global image, imageDraw
+    image = Image.new("1", (800, 480), WHITE)
+    imageDraw = ImageDraw.Draw(image)
+
     AddCalendarBoxes()
     AddDaysOfWeek()
     AddWeather(weatherCode)

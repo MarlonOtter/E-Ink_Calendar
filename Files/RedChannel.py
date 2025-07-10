@@ -1,20 +1,20 @@
 # RedChannel.py
 # This generates the red channel of the calendar image
 # Author: Marlon Otter
-# Date (dd-mm-yyy): 09-07-2025
+# Date (dd-mm-yyy): 10-07-2025
 
 import MultiLineText as mlt
 
 from PIL import Image,ImageDraw
 import datetime as dt
+import os
 
 # Import all the required constants and methods from the general file
-from CalendarUtils import FORMAT, DATEFONT, CURRENT_EVENTFONT, NEXT_EVENTFONT, DAYFONT, ALLMONTHS, DATE, _CalendarPosition, _DrawCalendarBox
+from CalendarUtils import FORMAT, DATEFONT, CURRENT_EVENTFONT, NEXT_EVENTFONT, ALLMONTHS, _CalendarPosition, _DrawCalendarBox
 
 # Define the values for drawing in RED and WHITE
 RED = 0
 WHITE = 255
-
 DATE = dt.datetime.today()
 
 # define the image 
@@ -61,7 +61,7 @@ def AddDate():
         )
     
 
-def AddWeather(weatherCode):
+def AddWeather(weatherCode:str):
     if not weatherCode:
         return
     
@@ -71,14 +71,14 @@ def AddWeather(weatherCode):
 
     top = FORMAT["sideBox"]["weather"]["top"]
     
-    weatherIcon = Image.open(f"Assets/Weather/{weatherCode[:-1]}d@4xR.png")
+    weatherIcon = Image.open(os.path.join(os.path.dirname(__file__), "Assets", "Weather", f"{weatherCode[:-1]}d@4xR.png"))
     image.paste(
         weatherIcon,
         ((pos[0] + size[0]) // 2 - imageSize[0]//2, top)
         )
 
 
-def AddEventInfo(events):
+def AddEventInfo(events:dict):
     # Get any events that are today
     # and the next event
     currentEvents = []
@@ -145,7 +145,7 @@ def AddEventInfo(events):
 
 
 def HighlightToday():
-    pos = _CalendarPosition(DATE.year, DATE.month, DATE.day)
+    pos = _CalendarPosition(DATE.year, DATE.month, DATE.day-1)
     size = FORMAT["calendar"]["size"]
     padding = FORMAT["calendar"]["day"]["padding"]
 
@@ -153,7 +153,7 @@ def HighlightToday():
 
     _DrawCalendarBox(imageDraw, pos, RED, WHITE, DATE.day)
 
-def AddUpcomingEvents(events):
+def AddUpcomingEvents(events:dict):
     # loop through each event
     for event in events:
         startDT = dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
@@ -162,7 +162,8 @@ def AddUpcomingEvents(events):
             continue 
 
         # calculate the position of the square that is going to be 
-        pos = _CalendarPosition(startDT.year, startDT.month, startDT.day)
+        # For some reason I have to -1 from the day, problably to do with 0-indexed arrays or something 
+        pos = _CalendarPosition(startDT.year, startDT.month, startDT.day-1)
         
         # Padding and size of the event icon 
         padding = FORMAT["calendar"]["events"]["padding"]
@@ -177,7 +178,12 @@ def AddUpcomingEvents(events):
             )
 
 
-def Draw(weather, events):
+def Draw(weather:str, events:dict):
+    #Reset the images
+    global image, imageDraw
+    image = Image.new("1", (800, 480), WHITE)
+    imageDraw = ImageDraw.Draw(image)
+
     AddMainBox()
     AddDate()
     AddWeather(weather)

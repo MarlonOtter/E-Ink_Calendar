@@ -1,15 +1,20 @@
-#import time
+# GetForcastWeather.py
+# Gets the Weather Forcast for today 
+# Author: Marlon Otter
+# Date (dd-mm-yyy): 10-07-2025
+
+
 from datetime import datetime
 import requests as req
 import json
 from dateutil import parser
-
+import os 
 
 class Forcast():
     def __init__(self):
         
         # read the file storing all sensative information
-        with open("APIs/secrets/OpenWeatherMap/key.json", "r") as f:
+        with open(os.path.join(os.path.dirname(__file__), "secrets", "OpenWeatherMap", "key.json"), "r") as f:
             APIinfo = json.load(f)
 
         # Generate a url that will be used to make a request to

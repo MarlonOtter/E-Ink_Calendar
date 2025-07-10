@@ -36,8 +36,8 @@
             "top": 40
         },
         "events": {
-            "padding": 4,
-            "size": 12
+            "padding": 7,
+            "size": 10
         },
         "day": {
             "font": "FreeSans.ttf",

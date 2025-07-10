@@ -2,47 +2,48 @@
 # This contains methods and constants used across multiple files 
 #   so that they don't have to be redeclared in multiple places
 # Author: Marlon Otter
-# Date (dd-mm-yyy): 09-07-2025
+# Date (dd-mm-yyy): 10-07-2025
 
 import json 
 import calendar as cal
 from PIL import ImageFont
 import datetime as dt
+import os
 
-
-DATE = dt.datetime.today()
-
+path = os.path.dirname(__file__)
 
 # Read the format data from the file
 # Just a json file with a bunch of numbers
 FORMAT = ""
-with open("format.json", "r") as f:
+with open(os.path.join(path, "format.json"), "r") as f:
     FORMAT = json.load(f)
+    
+
 
 # All the fonts
 # Uses format.json for all of its information
 DATEFONT = ImageFont.truetype(
-    f"Assets/{FORMAT['sideBox']['date']['font']}",
+    os.path.join(path, 'Assets', FORMAT['sideBox']['date']['font']),
     FORMAT["sideBox"]["date"]["fontSize"]
     )
 
 CURRENT_EVENTFONT = ImageFont.truetype(
-    f"Assets/{FORMAT['sideBox']['currentEvent']['font']}",
+    os.path.join(path, 'Assets', FORMAT['sideBox']['currentEvent']['font']),
     FORMAT["sideBox"]["currentEvent"]["fontSize"]
     )
 
 NEXT_EVENTFONT = ImageFont.truetype(
-    f"Assets/{FORMAT['sideBox']['nextEvent']['font']}",
+    os.path.join(path, 'Assets', FORMAT['sideBox']['nextEvent']['font']),
     FORMAT["sideBox"]["nextEvent"]["fontSize"]
     )
 
 DAYFONT = ImageFont.truetype(
-    f"Assets/{FORMAT['calendar']['day']['font']}", 
+    os.path.join(path, 'Assets', FORMAT['calendar']['day']['font']), 
     FORMAT["calendar"]["day"]["fontSize"]
     )
 
 WEEKDAYFONT = ImageFont.truetype(
-    f"Assets/{FORMAT['calendar']['weekday']['font']}", 
+    os.path.join(path, 'Assets', FORMAT['calendar']['weekday']['font']), 
     FORMAT["calendar"]["weekday"]["fontSize"]
     )
 
@@ -53,9 +54,6 @@ ALLMONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","
 REDONLY_WEATHER = ["01", "02", "03", "13", "50"]
 
 
-# Day of the week that the month starts on
-_STARTDAY = None
-
 # subprocedure that calculates the position of the provided day on the calendar
 def _CalendarPosition(year:int, month:int, day:int):
     pos = FORMAT["calendar"]["pos"]
@@ -65,13 +63,10 @@ def _CalendarPosition(year:int, month:int, day:int):
     weeks = cal.Calendar().monthdatescalendar(year, month)
 
     # Calculate where the days of this month start
-    # Only runs this bit when running the function for the first time as it is the same when ran again
-    firstDay = _STARTDAY
-    if _STARTDAY == None:
-        for i, weekDay in enumerate(weeks[0]):
-            if weekDay.month == month:
-                firstDay = i+1
-                break
+    for i, weekDay in enumerate(weeks[0]):
+        if weekDay.month == month:
+            firstDay = i + 1
+            break
             
     # identify the week that it is likely in
     week = day // 7

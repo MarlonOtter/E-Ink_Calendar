@@ -1,3 +1,9 @@
+# googleCalendarAPI.py
+# makes requests to the Google Calendar API to get data such as stored events 
+# Author: Marlon Otter
+# Date (dd-mm-yyy): 10-07-2025
+
+
 #import libraries
 from APIs.Events import *
 import json
@@ -11,7 +17,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 # say the scope that the calendar will use (read/write data)
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 
-directory = "APIs/secrets/GoogleCalendar/"
+directory = os.path.join(os.path.dirname(__file__), "secrets", "GoogleCalendar")
 
 class GoogleCalendar:
     def __init__(self):
@@ -30,19 +36,19 @@ class GoogleCalendar:
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        if os.path.exists(f"{directory}token.json"):
-            self.creds = Credentials.from_authorized_user_file(f"{directory}token.json", SCOPES)
+        if os.path.exists(os.path.join(directory, "token.json")):
+            self.creds = Credentials.from_authorized_user_file(os.path.join(directory, "token.json"), SCOPES)
         # If there are no (valid) credentials available, let the user log in.
         if not self.creds or not self.creds.valid:
             if self.creds and self.creds.expired and self.creds.refresh_token:
                 self.creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    f"{directory}credentials.json", SCOPES
+                    os.path.join(directory, "credentials.json"), SCOPES
                 )
                 self.creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open(f"{directory}token.json", "w") as token:
+            with open(os.path.join(directory, "token.json"), "w") as token:
                 token.write(self.creds.to_json())
 
 
@@ -50,7 +56,7 @@ if __name__ == "__main__":
     cal = GoogleCalendar()
     
     #add the calendars from the calendar json list
-    with open(f"{directory}calendars.json", "r") as f:
+    with open(os.path.join(directory, "calendars.json"), "r") as f:
         txt = f.readlines()
         jsonData = json.loads("".join(txt))
         if not jsonData:
