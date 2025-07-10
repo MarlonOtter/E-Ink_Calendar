@@ -1,3 +1,8 @@
+# MultiLineText.py
+# Splits up multiple lines of text grouping words together
+# Author: Marlon Otter
+# Date (dd-mm-yyy): xx-xx-2022
+
 def splitText(inputStr, lineLength):
     if len(inputStr) <= lineLength:
         return inputStr
@@ -24,8 +29,8 @@ def splitText(inputStr, lineLength):
 
 
 if __name__ == "__main__":
-    string = "Hello my name is marlon Otter, I am 15 years old and these lines can only be a maximum of 10 characters long"
-    #string = "1 2 3 4 5 1 2 3 4 5 1 2 3 4 5"
+    # Just some randomly generated sentence
+    string = "Truth in advertising and dinosaurs with skateboards have much in common. David subscribes to the 'stuff your tent into the bag' strategy over nicely folding it."
     text = splitText(string, 10)
     print(text)
 

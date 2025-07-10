@@ -1,11 +1,17 @@
 #import libraries
-from Events import *
+from APIs.Events import *
 import json
+
+import os
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+
 
 # say the scope that the calendar will use (read/write data)
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 
-directory = "Files/Secrets/"
+directory = "APIs/secrets/GoogleCalendar/"
 
 class GoogleCalendar:
     def __init__(self):
@@ -13,10 +19,12 @@ class GoogleCalendar:
         self.Events = Events(self)
         self.calendarIds = []
 
+    # Add the provided calendar to the list of calendars that will be searched
     def addCalendar(self, id):
         if id:
             self.calendarIds.append(id)
 
+    # 
     def check(self):
         self.creds = None
         # The file token.json stores the user's access and refresh tokens, and is
@@ -41,7 +49,7 @@ class GoogleCalendar:
 if __name__ == "__main__":
     cal = GoogleCalendar()
     
-    #add the calendars
+    #add the calendars from the calendar json list
     with open(f"{directory}calendars.json", "r") as f:
         txt = f.readlines()
         jsonData = json.loads("".join(txt))
@@ -49,7 +57,7 @@ if __name__ == "__main__":
             print("No calendars found in calendars.json")
             exit(1)
         for calendar in jsonData["calendars"]:
-            print(f"Adding calendar: {calendar['name']}")
+            print(f"Adding calendar: {calendar['id']}")
             cal.addCalendar(calendar["id"])
             
     today = dt.datetime.today()

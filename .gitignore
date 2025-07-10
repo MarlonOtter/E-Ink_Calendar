@@ -1,1 +1,9 @@
-/Files/Secrets
+/Files/OutputImgs
+Files/WeatherData.json
+/Files/__pycache__
+/Files/APIs/Secrets
+/Files/OLD
+calendars.json
+/Files/APIs/__pycache__
+/Files/Output
+/Files/waveshare_epd/__pycache__

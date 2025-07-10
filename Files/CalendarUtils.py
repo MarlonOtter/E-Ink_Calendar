@@ -1,0 +1,119 @@
+# CalendarUtils.py
+# This contains methods and constants used across multiple files 
+#   so that they don't have to be redeclared in multiple places
+# Author: Marlon Otter
+# Date (dd-mm-yyy): 09-07-2025
+
+import json 
+import calendar as cal
+from PIL import ImageFont
+import datetime as dt
+
+
+DATE = dt.datetime.today()
+
+
+# Read the format data from the file
+# Just a json file with a bunch of numbers
+FORMAT = ""
+with open("format.json", "r") as f:
+    FORMAT = json.load(f)
+
+# All the fonts
+# Uses format.json for all of its information
+DATEFONT = ImageFont.truetype(
+    f"Assets/{FORMAT['sideBox']['date']['font']}",
+    FORMAT["sideBox"]["date"]["fontSize"]
+    )
+
+CURRENT_EVENTFONT = ImageFont.truetype(
+    f"Assets/{FORMAT['sideBox']['currentEvent']['font']}",
+    FORMAT["sideBox"]["currentEvent"]["fontSize"]
+    )
+
+NEXT_EVENTFONT = ImageFont.truetype(
+    f"Assets/{FORMAT['sideBox']['nextEvent']['font']}",
+    FORMAT["sideBox"]["nextEvent"]["fontSize"]
+    )
+
+DAYFONT = ImageFont.truetype(
+    f"Assets/{FORMAT['calendar']['day']['font']}", 
+    FORMAT["calendar"]["day"]["fontSize"]
+    )
+
+WEEKDAYFONT = ImageFont.truetype(
+    f"Assets/{FORMAT['calendar']['weekday']['font']}", 
+    FORMAT["calendar"]["weekday"]["fontSize"]
+    )
+
+
+ALLDAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] 
+ALLMONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+
+REDONLY_WEATHER = ["01", "02", "03", "13", "50"]
+
+
+# Day of the week that the month starts on
+_STARTDAY = None
+
+# subprocedure that calculates the position of the provided day on the calendar
+def _CalendarPosition(year:int, month:int, day:int):
+    pos = FORMAT["calendar"]["pos"]
+    size = FORMAT["calendar"]["size"]
+
+    # Get an array of all the weeks that make up the month
+    weeks = cal.Calendar().monthdatescalendar(year, month)
+
+    # Calculate where the days of this month start
+    # Only runs this bit when running the function for the first time as it is the same when ran again
+    firstDay = _STARTDAY
+    if _STARTDAY == None:
+        for i, weekDay in enumerate(weeks[0]):
+            if weekDay.month == month:
+                firstDay = i+1
+                break
+            
+    # identify the week that it is likely in
+    week = day // 7
+
+    # calculate how many more days to offset by
+    daysRemainder = day % 7
+    # If the day of the week is greater than 7 move onto the next week
+    if firstDay + daysRemainder > 7:
+        daysRemainder -= 7
+        # Apply an extra week offset
+        week += 1
+        
+
+    # Calculate the position in the week that the day is
+    dayOfWeek = (firstDay + daysRemainder)
+
+    # calculate the size of each square on the 7x6 grid
+    squareSize = [size[0] // 7, size[1] // 6]
+
+    # Calculate position of the square
+    return [pos[0] + squareSize[0] * (dayOfWeek - 1), pos[1] + squareSize[1] * week]
+
+
+
+def _DrawCalendarBox(imageDraw, pos, boxFill:int, textFill:int, day:str):
+    size = FORMAT["calendar"]["size"]
+    padding = FORMAT["calendar"]["day"]["padding"]
+    boxSize = [size[0]//7 - padding*2, size[1]//6 - padding*2]
+
+    # Draw the square
+    imageDraw.rectangle(
+        (pos[0] + padding, pos[1] + padding, pos[0] + padding + boxSize[0], pos[1] + padding + boxSize[1]), 
+        outline = 0, 
+        width=3, 
+        fill=boxFill
+        )
+            
+    # Draw the day number
+    imageDraw.text(
+        (pos[0] + (padding + boxSize[0])//2, pos[1] + (padding + boxSize[1])//2), 
+        f"{day}", 
+        font=DAYFONT, 
+        fill=textFill, 
+        anchor="mm"
+        )

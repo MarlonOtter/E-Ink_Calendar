@@ -1,0 +1,206 @@
+# RedChannel.py
+# This generates the red channel of the calendar image
+# Author: Marlon Otter
+# Date (dd-mm-yyy): 09-07-2025
+
+import MultiLineText as mlt
+
+from PIL import Image,ImageDraw
+import datetime as dt
+
+# Import all the required constants and methods from the general file
+from CalendarUtils import FORMAT, DATEFONT, CURRENT_EVENTFONT, NEXT_EVENTFONT, DAYFONT, ALLMONTHS, DATE, _CalendarPosition, _DrawCalendarBox
+
+# Define the values for drawing in RED and WHITE
+RED = 0
+WHITE = 255
+
+DATE = dt.datetime.today()
+
+# define the image 
+image = Image.new("1", (800, 480), WHITE)
+imageDraw = ImageDraw.Draw(image)
+
+
+def AddMainBox():
+    pos = FORMAT["sideBox"]["pos"]
+    size = FORMAT["sideBox"]["size"]
+    imageDraw.rectangle((pos[0], pos[1], size[0], size[1]), fill=RED)
+
+
+def AddDate():
+    # Get the information from the json
+    pos = FORMAT["sideBox"]["pos"]
+    size = FORMAT["sideBox"]["size"]
+    padding = FORMAT["sideBox"]["date"]["top"]
+
+    # Adds the correct suffix to the date
+    todayDay = int(str(DATE.day)[-1]) - 1
+    suffixList = ["st", "nd", "th"]
+    if todayDay > 2: todayDay = 2
+    suffix = suffixList[todayDay]
+
+    # Draw the text
+    imageDraw.text(
+        ((pos[0] + (size[0] // 2) - 15), (pos[1] + padding)),
+        f"{DATE.day}{suffix} {ALLMONTHS[DATE.month-1]} {DATE.year}",
+        fill=WHITE, 
+        font=DATEFONT, 
+        anchor="mm"
+        )
+    
+    # Draw the Underline underneath the text
+    top = FORMAT["sideBox"]["date"]["underline"]["top"]
+    side = FORMAT["sideBox"]["date"]["underline"]["side"]
+
+    imageDraw.line(
+        ((pos[0] + side, pos[1] + padding + top), 
+         (size[0] - side, pos[1] + padding + top)),
+        fill=WHITE,
+        width=3
+        )
+    
+
+def AddWeather(weatherCode):
+    if not weatherCode:
+        return
+    
+    pos = FORMAT["sideBox"]["pos"]
+    size = FORMAT["sideBox"]["size"]
+    imageSize = FORMAT["sideBox"]["weather"]["size"]
+
+    top = FORMAT["sideBox"]["weather"]["top"]
+    
+    weatherIcon = Image.open(f"Assets/Weather/{weatherCode[:-1]}d@4xR.png")
+    image.paste(
+        weatherIcon,
+        ((pos[0] + size[0]) // 2 - imageSize[0]//2, top)
+        )
+
+
+def AddEventInfo(events):
+    # Get any events that are today
+    # and the next event
+    currentEvents = []
+    nextEvent = None
+    # Loop through all the events
+    for event in events:
+        # Get the start date
+        eventDate = dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
+        # If it is today add it to the list
+        if (eventDate.year == DATE.year) and (eventDate.month == DATE.month) and (eventDate.day == DATE.day):
+            currentEvents.append(event)
+        # if it is after today it is the next event so store that and stop looping
+        eventDate = dt.datetime(eventDate.year, eventDate.month, eventDate.day)
+        if (eventDate > DATE):
+            nextEvent = event
+            break
+    
+    # Draw the events that are today
+    text = ""
+    # Loop through all the events
+    for item in currentEvents:
+        # Get the description
+        text += f"{item['summary']} \n"
+    # if the description is longer than 20 characters, split it to seperate lines 
+    textArray = (mlt.splitText(text, 20)).split(" \n")
+    # Remove any empty lines if there are any
+    try:
+        textArray.remove(" ")
+    except ValueError: pass
+    
+    pos = FORMAT["sideBox"]["pos"]
+    size = FORMAT["sideBox"]["size"]
+    boxMiddle = (pos[0] + size[0])//2
+    currentEventTop = FORMAT["sideBox"]["currentEvent"]["top"]
+    currentEventFontSize = FORMAT["sideBox"]["currentEvent"]["fontSize"]
+
+    # Go through each line of text and draw it on the image
+    for index, line in enumerate(textArray):
+        line = line.replace("\n", "")
+        imageDraw.text(
+            (boxMiddle, currentEventTop + (index * currentEventFontSize)), 
+            line, 
+            fill=WHITE, 
+            anchor="mm", 
+            font=CURRENT_EVENTFONT
+            )
+
+
+
+    # Draw the upcoming event
+    nextEventTop = FORMAT["sideBox"]["nextEvent"]["top"]
+    
+    # Only draw anything if there is an event
+    if not nextEvent:
+        return
+    
+    imageDraw.text(
+        (boxMiddle, nextEventTop), 
+        f"Next Event:\n{mlt.splitText(nextEvent.get('summary'), 20)}",
+        fill=WHITE, 
+        anchor="mm", 
+        font=NEXT_EVENTFONT
+        )
+
+
+def HighlightToday():
+    pos = _CalendarPosition(DATE.year, DATE.month, DATE.day)
+    size = FORMAT["calendar"]["size"]
+    padding = FORMAT["calendar"]["day"]["padding"]
+
+    squareSize = [size[0]//7 - padding*2, size[1]//6 - padding*2]
+
+    _DrawCalendarBox(imageDraw, pos, RED, WHITE, DATE.day)
+
+def AddUpcomingEvents(events):
+    # loop through each event
+    for event in events:
+        startDT = dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
+        # check that it is in the range that can be displayed on the calendar
+        if (startDT.month != DATE.month) or (startDT.year != DATE.year) or (startDT.year == DATE.year and startDT.month == DATE.month and startDT.day == DATE.year):
+            continue 
+
+        # calculate the position of the square that is going to be 
+        pos = _CalendarPosition(startDT.year, startDT.month, startDT.day)
+        
+        # Padding and size of the event icon 
+        padding = FORMAT["calendar"]["events"]["padding"]
+        size = FORMAT["calendar"]["events"]["size"]
+
+        # Draw the point
+        imageDraw.rectangle(
+            (pos[0] + padding, pos[1] + padding, pos[0] + size + padding, pos[1] + size + padding),
+            outline=0,
+            width=8,
+            fill=RED
+            )
+
+
+def Draw(weather, events):
+    AddMainBox()
+    AddDate()
+    AddWeather(weather)
+    AddEventInfo(events)
+    HighlightToday()
+    AddUpcomingEvents(events)
+    return image
+
+
+if __name__ == "__main__":
+    # Example weather and event data
+    weather = "09d"
+    events = [
+  {
+    "summary": "Test event",
+    "start": {
+      "date": "2025-07-15"
+    },
+    "end": {
+      "date": "2025-07-11"
+    }
+  }
+]
+
+    Draw(weather, events)
+    image.save("Output/red_channel.png")

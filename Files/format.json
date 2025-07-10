@@ -1,0 +1,48 @@
+{
+    "sideBox": {
+        "pos": [30, 30],
+        "size": [266, 450],
+        "weather": {
+            "size": [200, 200],
+            "top": 235
+        },
+        "date": {
+            "top": 30,
+            "font": "FreeSans.ttf",
+            "fontSize": 30,
+            "underline": {
+                "top": 25,
+                "side": 15
+            }
+        },
+        "currentEvent": {
+            "top": 115,
+            "font": "FreeSans.ttf",
+            "fontSize": 24
+        },
+        "nextEvent": {
+            "top": 240,
+            "font": "FreeSans.ttf",
+            "fontSize": 24
+        }
+    },
+
+    "calendar": {
+        "pos": [295, 60],
+        "size": [476, 390],
+        "weekday": {
+            "font": "FreeSans.ttf",
+            "fontSize": 24,
+            "top": 40
+        },
+        "events": {
+            "padding": 4,
+            "size": 12
+        },
+        "day": {
+            "font": "FreeSans.ttf",
+            "fontSize": 36,
+            "padding": 2
+        }
+    }
+}
