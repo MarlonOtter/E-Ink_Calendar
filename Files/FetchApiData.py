@@ -23,20 +23,15 @@ with open(os.path.join(os.path.dirname(__file__), "APIs", "secrets", "GoogleCale
         exit(1)
     for calendarItem in jsonData["calendars"]:
         calendar.addCalendar(calendarItem["id"])
-        print(f"Adding calendar: {calendarItem['name']}")
+        
 
 def GetWeather():
-
-    start = dt.datetime.now()
     data = forcast.getForcast()
-    print(f"Weather Request Took: {dt.datetime.now() - start}")
 
     return data[2]
 
 def GetCalendar(date):
-    start = dt.datetime.now()
     events = calendar.Events.getWithin(dt.datetime(date.year, date.month, 1), date + dt.timedelta(days=cal.monthrange(date.year, date.month)[1]))
-    print(f"google Calendar Request Took: {dt.datetime.now() - start}")
     return events
 
 if __name__ == "__main__":

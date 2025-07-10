@@ -18,11 +18,11 @@ class Forcast():
             APIinfo = json.load(f)
 
         # Generate a url that will be used to make a request to
-        self.url = f"https://api.openweathermap.org/data/2.5/forecast?lat={APIinfo['lat']}&lon={APIinfo['lon']}&units=metric&appid={APIinfo['key']}" #final url
+        self.url = f"https://api.openweathermap.org/data/2.5/weather?lat={APIinfo['lat']}&lon={APIinfo['lon']}&units=metric&appid={APIinfo['key']}" #final url
     
     def getForcast(self):
-        cDateTime = datetime.now()
-        self.cTime = datetime(cDateTime.year, cDateTime.month, cDateTime.day, 21)
+        date = datetime.today()
+        
 
         self.fetchData()
         self.handleData()
@@ -32,21 +32,14 @@ class Forcast():
         self.reqData = req.get(self.url).json()
 
     def handleData(self):
-        #get the weather for today and time
-        #loop through all the data finding selecting the one with current data + time
-        for item in self.reqData["list"]:
-            itemTime = parser.parse(item["dt_txt"])
-            if itemTime == self.cTime:
-                #Returns weather and temperature Data
-                self.weather = item["weather"][0]["main"]
-                self.temp = round(item["main"]["temp"])
-                break
-        else:
-            self.weather, self.temp = None, None
-        
-        if self.weather:
-            self.icon = item["weather"][0]["icon"]
-        else:
+        try:
+            self.weather = self.reqData["weather"][0]["main"]
+            self.temp = self.reqData["main"]["temp"]
+            self.icon = self.reqData["weather"][0]["icon"]
+        except KeyError as e:
+            print(f"Error fetching weather data: {e}")
+            self.weather = "Unknown"
+            self.temp = None
             self.icon = None
 
     def returnData(self):

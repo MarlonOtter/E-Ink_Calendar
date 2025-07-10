@@ -58,6 +58,9 @@ def AddDaysOfWeek():
                 
 
 def AddWeather(weatherCode:str):
+    if not weatherCode:
+        return
+
     # If there isn't a black channel for the icon skip
     if weatherCode[:-1] in REDONLY_WEATHER:
         return

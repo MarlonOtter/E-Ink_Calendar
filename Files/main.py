@@ -4,6 +4,9 @@
 # Date (dd-mm-yyy): 10-07-2025
 
 import os
+import datetime as dt
+from multiprocessing.pool import ThreadPool
+import time
 
 # Some validation so that this file can be ran on windows/devices without the display connected
 importedScreenLib = True
@@ -22,7 +25,7 @@ REQUIREDFILES = [
         "APIs/secrets/GoogleCalendar/credentials.json",
         "APIs/secrets/GoogleCalendar/token.json",
         "APIs/secrets/OpenWeatherMap/key.json",
-        "calendars.json",
+        "APIs/secrets/GoogleCalendar/calendars.json",
         "Assets/FreeSans.ttf",
         "Assets/Weather", # All the weather images in the directory
     ]
@@ -44,8 +47,14 @@ def CheckFiles():
 
 def GetData():
     import FetchApiData as APIs
-    weather = APIs.GetWeather()
-    events = APIs.GetCalendar()
+    
+    pool = ThreadPool(processes=2)
+    asyncWeather = pool.apply_async(APIs.GetWeather)
+    asyncEvents = pool.apply_async(APIs.GetCalendar, (dt.datetime.today(),))
+
+    events = asyncEvents.get()
+    weather = asyncWeather.get()
+
     return weather, events
 
 
@@ -83,21 +92,35 @@ def Run():
     if CheckFiles() == -1: return
 
     # Make the API calls
+    start = dt.datetime.now()
     weather, events = GetData()
+    print("API Requests Took: ", dt.datetime.now() - start)
+    """
+    # Generate the images in async
+    pool = ThreadPool(processes=2)
+    asyncRed = pool.apply_async(GenerateRed, (weather, events))
+    asyncBlack = pool.apply_async(GenerateBlack, (weather,))
 
-    # Generate the images
+    # Setup Hardware can be done here
+    if importedScreenLib:
+        SetupHardware()
+
+    red = asyncRed.get()
+    black = asyncBlack.get()
+    """
+
     red = GenerateRed(weather, events)
     black = GenerateBlack(weather)
 
-    # Run all the Hardware stuff
+    # Display the images on the screen
     if importedScreenLib:
-        SetupHardware()
         DisplayImage(red, black)
         Complete()
     else:
         # Or show the images if the hardware stuff doesn't work
-        red.show()
-        black.show()
+        pass
 
 if __name__ == "__main__":
+    start = dt.datetime.now()
     Run()
+    print("Total Time Taken: ", dt.datetime.now() - start)
