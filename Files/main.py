@@ -82,7 +82,6 @@ def DisplayImage(red, black):
 # Put the display to sleep
 def Complete():
     epd.sleep()
-    epd7in5b_V2.epdconfig.module_exit()
 
 
 def Run():
