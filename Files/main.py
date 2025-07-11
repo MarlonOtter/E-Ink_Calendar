@@ -67,16 +67,19 @@ def SetupHardware():
 def GenerateRed(weather, events):
     import RedChannel as RC
     RC.Draw(weather, events)
-    return RC.image
+    
+    return RC.image.rotate(180)
 
 # Generate the Black Channel of the calendar to be displayed
 def GenerateBlack(weather):
     import BlackChannel as BC
     BC.Draw(weather)
-    return BC.image
+    
+    return BC.image.rotate(180)
 
 # Display the calendar on the screen
 def DisplayImage(red, black):
+
     epd.display(epd.getbuffer(black), epd.getbuffer(red))
 
 # Put the display to sleep

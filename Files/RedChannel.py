@@ -36,8 +36,15 @@ def AddDate():
 
     # Adds the correct suffix to the date
     todayDay = int(str(DATE.day)[-1]) - 1
-    suffixList = ["st", "nd", "th"]
-    if todayDay > 2: todayDay = 2
+    suffixList = ["st", "nd", "rd",  "th"]
+    
+    # days that are larger than 3 should be "th"
+    if todayDay > 3: todayDay = 3
+
+    # If the day is 11, 12 or 13, it should be "th"
+    if DATE.day == 11 or DATE.day == 12 or DATE.day == 13:
+        todayDay = 3
+        
     suffix = suffixList[todayDay]
 
     # Draw the text
