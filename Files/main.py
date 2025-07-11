@@ -91,33 +91,29 @@ def Run():
     # Make sure all the files that are required are accessable before running the program
     if CheckFiles() == -1: return
 
+    pool = ThreadPool(processes=2)
+
+    # Setup Hardware asynchronously as it can take a while
+    if importedScreenLib:
+        asyncSetup = pool.apply_async(SetupHardware)
+
     # Make the API calls
     start = dt.datetime.now()
     weather, events = GetData()
     print("API Requests Took: ", dt.datetime.now() - start)
-    """
-    # Generate the images in async
-    pool = ThreadPool(processes=2)
-    asyncRed = pool.apply_async(GenerateRed, (weather, events))
-    asyncBlack = pool.apply_async(GenerateBlack, (weather,))
 
-    # Setup Hardware can be done here
-    if importedScreenLib:
-        SetupHardware()
-
-    red = asyncRed.get()
-    black = asyncBlack.get()
-    """
-
-    red = GenerateRed(weather, events)
     black = GenerateBlack(weather)
+    red = GenerateRed(weather, events)
+    
 
     # Display the images on the screen
     if importedScreenLib:
+        asyncSetup.get()
         DisplayImage(red, black)
         Complete()
     else:
-        # Or show the images if the hardware stuff doesn't work
+        red.save("Output/red_channel.png")
+        black.save("Output/black_channel.png")
         pass
 
 if __name__ == "__main__":
