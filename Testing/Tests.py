@@ -6,7 +6,7 @@
 import datetime as dt
 import Simulate as sim
 import json
-
+import multiprocessing as mp
 
 import os 
 import sys
@@ -25,11 +25,19 @@ def TestAllDates():
         print("Invalid Input")
         return
 
+    proccessQueue = []
+
     # Loop through all the days in that year
     date = dt.datetime(year, 1, 1)
     while date.year == year:
-        RunSimulation(date, "09d", False)
+        # Im not sure if this is actually any faster than just running it normally
+        # Will need to test it
+        proccessQueue.append(mp.Process(target = RunSimulation, args=(date, "09d", False)))
+        proccessQueue[-1].start()
         date += dt.timedelta(days=1)
+
+    for proccess in proccessQueue:
+        proccess.join()
 
 def TestDataSetDates():
     # Get the year that the user wants to be tested
@@ -93,7 +101,6 @@ def TestCustomDate():
 
 
 def TestAllWeather():
-    
     # Loop through all the weather inputs
     for weather in WEATHER_TYPES:
         RunSimulation(dt.datetime.today(), weather, False)

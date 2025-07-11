@@ -6,7 +6,6 @@
 import os
 import datetime as dt
 from multiprocessing.pool import ThreadPool
-import time
 
 # Some validation so that this file can be ran on windows/devices without the display connected
 importedScreenLib = True
@@ -15,7 +14,6 @@ try:
 except:
     print("ERROR LOADING 'waveshare_epd' LIBRARY")
     importedScreenLib = False
-
 
 epd = None
 
