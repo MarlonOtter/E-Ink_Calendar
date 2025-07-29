@@ -2,6 +2,21 @@
 
 Calendar that displays the weather and upcoming events on a waveshare 7x5in E-ink display. Initially started in mid-2023
 
+## Example Output
+
+![Example Output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Combined_2024-12-24.png)
+
+As the display is an e-ink display that can only display 2 colours, I have to generate the image to be displayed in 2 seperate colour channels (seperate images).
+Each of these iamges are a black and white and the display combines both images into red, white and black
+
+## Red Channel
+
+![Red Channel output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Red_2024-12-24.png)
+
+## Black Channel
+
+![Black Channel output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Black_2024-12-24.png)
+
 To use this, a Google project needs to be setup, using the developer dashboard. And the credentials stored
 in the folder: APIs/secrets/GoogleCalendar/
 
