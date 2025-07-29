@@ -155,9 +155,11 @@ def RunSimulation(date:dt.datetime, weather:str, showEvents:bool):
     # Draw the image
     red.DATE = date
     red.Draw(weather, events)
+    red.image.save(os.path.join("Channels", "RedChannel.png"))
 
     black.DATE = date
     black.Draw(weather)
+    black.image.save(os.path.join("Channels", "BlackChannel.png"))
 
     # Combine the images into one
     result = sim.Simulate(red.image, black.image)

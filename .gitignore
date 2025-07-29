@@ -7,4 +7,5 @@ calendars.json
 /Files/waveshare_epd/__pycache__
 /Testing/__pycache__
 /Testing/Output
+/Testing/Channels
 .env
