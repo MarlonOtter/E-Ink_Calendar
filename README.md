@@ -80,3 +80,11 @@ This should then send an email with any important information such as:
 - important event information
 
 ---
+
+## Running The Calendar
+
+execute the run.py file:
+
+```Bash
+python3 run.py
+```
