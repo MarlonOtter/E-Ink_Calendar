@@ -7,6 +7,8 @@ import os
 import datetime as dt
 from multiprocessing.pool import ThreadPool
 
+import APIs.SendErrorEmail as sendErrorEmail
+
 # Some validation so that this file can be ran on windows/devices without the display connected
 importedScreenLib = True
 try:
@@ -17,6 +19,8 @@ except:
 
 epd = None
 
+apiData = ""
+
 # List of all extra files that are needed for the program to run (non-code)
 REQUIREDFILES = [
         "format.json",
@@ -24,6 +28,7 @@ REQUIREDFILES = [
         "APIs/secrets/GoogleCalendar/token.json",
         "APIs/secrets/OpenWeatherMap/key.json",
         "APIs/secrets/GoogleCalendar/calendars.json",
+        "APIs/secrets/email.json",
         "Assets/FreeSans.ttf",
         "Assets/Weather", # All the weather images in the directory
     ]
@@ -44,6 +49,7 @@ def CheckFiles():
     return 0
 
 def GetData():
+    global apiData
     import FetchApiData as APIs
     
     pool = ThreadPool(processes=2)
@@ -53,6 +59,8 @@ def GetData():
     events = asyncEvents.get()
     weather = asyncWeather.get()
 
+    apiData = (weather, events)
+    
     return weather, events
 
 
@@ -89,7 +97,8 @@ def Complete():
 
 def Run():
     # Make sure all the files that are required are accessable before running the program
-    if CheckFiles() == -1: return
+    if CheckFiles() == -1: 
+        raise ImportError("Missing Files required to run program")
 
     pool = ThreadPool(processes=2)
 
@@ -118,5 +127,17 @@ def Run():
 
 if __name__ == "__main__":
     start = dt.datetime.now()
-    Run()
+    try:
+        Run()
+    except Exception as e:
+        date = dt.datetime.now()
+        weather = "N/A"
+        events = "N/A"
+        if apiData:
+            weather = apiData[0]
+            events = apiData[1]
+        subject, body = sendErrorEmail.GenerateMessage(date, weather, events, e)
+        sendErrorEmail.sendEmail(subject, body)
+        print("Sent ERROR message to Email")
+    
     print("Total Time Taken: ", dt.datetime.now() - start)

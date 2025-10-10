@@ -17,6 +17,8 @@ Each of these iamges are a black and white and the display combines both images 
 
 ![Black Channel output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Black_2024-12-24.png)
 
+## Setup
+
 To use this, a Google project needs to be setup, using the developer dashboard. And the credentials stored
 in the folder: APIs/secrets/GoogleCalendar/
 
@@ -24,15 +26,15 @@ An access token needs to be retrieved by using the API, this should be stored wi
 
 Along with this add a new json file called calendars.json with this format to the same directory:
 
-```
+```json
  {
     "calendars" : [
         {
-            "name" : "Holidays"
+            "name" : "Holidays",
             "id" : "CALENDAR_ID"
         },
         {
-            "name" : "Personal"
+            "name" : "Personal",
             "id" : "CALENDAR_ID_2"
         }
     ]
@@ -46,7 +48,7 @@ This tells the program what calendars it should make requests to, through the AP
 To make use of the weather functionality the location and API key need to be provided in APIs/secrets/OpenWeatherMap/key.json
 In the following format:
 
-```
+```json
  {
     "lat": 0,
     "lon": 0,
@@ -55,5 +57,26 @@ In the following format:
 ```
 
 The latitude and longitude is your location and the key is the key that you get by setting up the openWeatherMap API
+
+To send Error Emails create a /APIs/email.json file and enter the following information:
+
+```json
+{
+  "senderAddr": "SENDER_EMAIL",
+  "appPassword": "APP_PASSWORD",
+
+  "debugAddr": "RECIEVER_EMAIL"
+}
+```
+
+The App password can be retreived from (remove any spaces):
+[https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+
+This should then send an email with any important information such as:
+
+- error type,
+- date
+- weather code
+- important event information
 
 ---
