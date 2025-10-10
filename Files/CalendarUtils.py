@@ -112,3 +112,6 @@ def _DrawCalendarBox(imageDraw, pos, boxFill:int, textFill:int, day:str):
         fill=textFill, 
         anchor="mm"
         )
+
+def _SameDay(a:dt.datetime, b:dt.datetime):
+    return (a.year == b.year and a.month == b.month and a.day == b.day)

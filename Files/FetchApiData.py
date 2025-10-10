@@ -32,6 +32,7 @@ def GetWeather():
 
 def GetCalendar(date):
     events = calendar.Events.getWithin(dt.datetime(date.year, date.month, 1), date + dt.timedelta(days=cal.monthrange(date.year, date.month)[1]))
+    #print(events)
     return events
 
 if __name__ == "__main__":

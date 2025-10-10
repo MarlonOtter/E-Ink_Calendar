@@ -199,5 +199,10 @@ if __name__ == "__main__":
             else:
                 print("USER DECLINED - Did not run the test")
 
+        case "0": 
+            date = dt.datetime.fromisoformat("2018-01-01")
+            RunSimulation(date, "09d", True)
+
+
         case _:
             print("Invalid Input, must be 1, 2 or 3")

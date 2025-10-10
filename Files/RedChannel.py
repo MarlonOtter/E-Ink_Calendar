@@ -10,7 +10,7 @@ import datetime as dt
 import os
 
 # Import all the required constants and methods from the general file
-from CalendarUtils import FORMAT, DATEFONT, CURRENT_EVENTFONT, NEXT_EVENTFONT, ALLMONTHS, _CalendarPosition, _DrawCalendarBox
+from CalendarUtils import FORMAT, DATEFONT, CURRENT_EVENTFONT, NEXT_EVENTFONT, ALLMONTHS, _CalendarPosition, _DrawCalendarBox, _SameDay
 
 # Define the values for drawing in RED and WHITE
 RED = 0
@@ -163,26 +163,101 @@ def HighlightToday():
 def AddUpcomingEvents(events:dict):
     # loop through each event
     for event in events:
-        startDT = dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
+        # get the date that the event starts and end
+        startDT:dt.datetime = dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
+        endDT:dt.datetime = dt.datetime.fromisoformat(event["end"].get("date") or event["end"].get("dateTime"))
+
+        isAllDay:bool = event["start"].get("date") is not None
+
+        if isAllDay: 
+            endDT += dt.timedelta(days=-1)
+
+        #? I'll leave this for now but it will need to be changed 
         # check that it is in the range that can be displayed on the calendar
         if (startDT.month != DATE.month) or (startDT.year != DATE.year) or (startDT.year == DATE.year and startDT.month == DATE.month and startDT.day == DATE.year):
-            continue 
+            continue
 
         # calculate the position of the square that is going to be 
         # For some reason I have to -1 from the day, problably to do with 0-indexed arrays or something 
-        pos = _CalendarPosition(startDT.year, startDT.month, startDT.day-1)
+        startPos = _CalendarPosition(startDT.year, startDT.month, startDT.day-1)
+        endPos = _CalendarPosition(endDT.year, endDT.month, endDT.day-1)
         
         # Padding and size of the event icon 
         padding = FORMAT["calendar"]["events"]["padding"]
-        size = FORMAT["calendar"]["events"]["size"]
+        sizeX = FORMAT["calendar"]["events"]["sizeX"]
+        longSizeX = FORMAT["calendar"]["events"]["longSizeX"]
+        sizeY = FORMAT["calendar"]["events"]["sizeY"]
+        calSize = FORMAT["calendar"]["size"]
 
-        # Draw the point
-        imageDraw.rectangle(
-            (pos[0] + padding, pos[1] + padding, pos[0] + size + padding, pos[1] + size + padding),
-            outline=0,
-            width=8,
-            fill=RED
-            )
+        # during the same week
+        #print(f"startPos: {startPos}, endPos: {endPos}")
+        if ((startPos[0] == endPos[0]) and (startPos[1] == endPos[1])):
+            #print("0")
+            _drawEventIcon(startPos, sizeX, sizeY, padding)
+        elif (startPos[1] == endPos[1]):
+            #print("1")
+            _drawEventIcon(startPos, (endPos[0] - startPos[0]) + longSizeX, sizeY, padding)
+        else:
+            #print("2")
+            # event covers multiple weeks
+            week:int = 0 
+            for i in range(0,6):
+                mon:dt.datetime = startDT + dt.timedelta( days=-(startDT.isoweekday()-1) + week * 7)
+                monPos = _CalendarPosition(mon.year, mon.month, mon.day-1)
+                
+                if _SameDay(mon, endDT):
+                    #print("2.1")
+                    _drawEventIcon(monPos, sizeX, sizeY, padding)
+                    break
+                
+                sun:dt.datetime = mon + dt.timedelta(days=6)
+                sunPos = _CalendarPosition(sun.year, sun.month, sun.day-1)
+                
+                if (week == 0):
+                    #print("2.2")
+                    if (not _checkEndOfMonth(startDT, startPos, sun, calSize, padding, sizeY)):
+                        _drawEventIcon(startPos, (sunPos[0] - startPos[0]) + (calSize[0] // 7) - padding * 2, sizeY, padding)
+                        week += 1
+                        continue
+                    break
+                
+                if _checkEndOfMonth(mon, monPos, sun, calSize, padding, sizeY):
+                    break
+                
+                if endDT > sun:
+                    #print("2.3")
+                    # draw a box between mon and sun        
+                    _drawEventIcon(monPos, (sunPos[0] - monPos[0]) + (calSize[0] // 7) - padding * 2, sizeY, padding)
+                    week += 1
+                    continue
+                #print("2.4")
+                
+                _drawEventIcon(monPos, (endPos[0] - monPos[0]) + longSizeX, sizeY, padding)
+                break
+
+
+def _checkEndOfMonth(mon, monPos, sun, calSize, padding, sizeY):
+    if (sun.month != mon.month):
+        #print("2.5")
+        lastDay = mon
+        for i in range(1,6):
+            temp = mon + dt.timedelta(days=i)
+            if (temp.month != mon.month):
+                break 
+            lastDay = temp  
+        #print(f"lastDayOfMonth: {lastDay.isoformat()}")    
+        pos = _CalendarPosition(lastDay.year, lastDay.month, lastDay.day-1)
+        _drawEventIcon(monPos, (pos[0] - monPos[0]) + (calSize[0] // 7) - padding * 2, sizeY, padding)
+        return True
+    return False        
+
+def _drawEventIcon( pos, sizeX:int, sizeY:int, padding:int):    
+    imageDraw.rectangle(
+        (pos[0] + padding, pos[1] + padding, pos[0] + sizeX + padding, pos[1] + sizeY + padding),
+        outline=0,
+        width=8,
+        fill=RED
+        )
 
 
 def Draw(weather:str, events:dict):
