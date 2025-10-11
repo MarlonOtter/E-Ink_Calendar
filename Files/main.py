@@ -12,7 +12,7 @@ import APIs.SendErrorEmail as sendErrorEmail
 # Some validation so that this file can be ran on windows/devices without the display connected
 importedScreenLib = True
 try:
-    import epaper
+    import epaper # type: ignore
 except:
     print("ERROR LOADING 'epaper' LIBRARY")
     importedScreenLib = False
@@ -67,7 +67,7 @@ def GetData():
 # Setup and clear the display
 def SetupHardware():
     global epd
-    epd = epaper.epaper('epd7in5').EPD()
+    epd = epaper.epaper('epd7in5b_V2').EPD()
     epd.init()
     epd.Clear()
 
