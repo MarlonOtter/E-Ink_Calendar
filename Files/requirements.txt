@@ -14,3 +14,4 @@ rsa==4.9.1
 urllib3==2.5.0
 google-api-python-client
 python-dateutil
+waveshare-epaper; sys_platform == "linux"

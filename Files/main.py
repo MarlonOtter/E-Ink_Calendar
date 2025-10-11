@@ -12,9 +12,9 @@ import APIs.SendErrorEmail as sendErrorEmail
 # Some validation so that this file can be ran on windows/devices without the display connected
 importedScreenLib = True
 try:
-    from waveshare_epd import epd7in5b_V2
+    import epaper
 except:
-    print("ERROR LOADING 'waveshare_epd' LIBRARY")
+    print("ERROR LOADING 'epaper' LIBRARY")
     importedScreenLib = False
 
 epd = None
@@ -67,7 +67,7 @@ def GetData():
 # Setup and clear the display
 def SetupHardware():
     global epd
-    epd = epd7in5b_V2.EPD()
+    epd = epaper.epaper('epd7in5').EPD()
     epd.init()
     epd.Clear()
 
