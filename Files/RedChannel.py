@@ -85,7 +85,7 @@ def AddWeather(weatherCode:str):
         )
 
 
-def AddEventInfo(events:dict):
+def AddEventInfo(events:dict, bins):
     # Get any events that are today
     # and the next event
     currentEvents = []
@@ -105,10 +105,18 @@ def AddEventInfo(events:dict):
     
     # Draw the events that are today
     text = ""
+     
     # Loop through all the events
     for item in currentEvents:
         # Get the description
         text += f"{item['summary']} \n"
+    
+    # add bin data if available
+    if bins:    
+        bin = bins.getTomorrow(DATE)
+        if bin:
+            text += f"\n{bin} bin \n"
+    
     # if the description is longer than 20 characters, split it to seperate lines 
     textArray = (mlt.splitText(text, 20)).split(" \n")
     # Remove any empty lines if there are any
@@ -260,7 +268,7 @@ def _drawEventIcon( pos, sizeX:int, sizeY:int, padding:int):
         )
 
 
-def Draw(weather:str, events:dict):
+def Draw(weather:str, events:dict, bins):
     #Reset the images
     global image, imageDraw
     image = Image.new("1", (800, 480), WHITE)
@@ -269,7 +277,7 @@ def Draw(weather:str, events:dict):
     AddMainBox()
     AddDate()
     AddWeather(weather)
-    AddEventInfo(events)
+    AddEventInfo(events, bins)
     HighlightToday()
     AddUpcomingEvents(events)
     return image

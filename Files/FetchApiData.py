@@ -35,11 +35,19 @@ def GetCalendar(date):
     #print(events)
     return events
 
+def GetBins():
+    import APIs.BinsAPI as bin
+    binDates = bin.getNextBinDates()
+    return binDates
+
 if __name__ == "__main__":
     # Get the Weather
     weatherCode = GetWeather()
     print("Code: " + weatherCode or "none")
 
     # Get the calendar
-    events = GetCalendar()
+    events = GetCalendar(dt.datetime.now())
     print("events: ", events)
+    
+    bins = GetBins()
+    print(bins.to_string(bins.black))

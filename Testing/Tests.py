@@ -69,9 +69,9 @@ def TestDataSetDates():
     print("Starting Tests")
     for date in dataSet["dates"]:
         dateTime = dt.datetime.fromisoformat(date)
-        dateTime.year = year
+        #dateTime.year = year
 
-        RunSimulation(date, "09d", showEvents)
+        RunSimulation(dateTime, "09d", showEvents)
 
     print("Tests Complete")
 
@@ -146,15 +146,18 @@ def RunSimulation(date:dt.datetime, weather:str, showEvents:bool):
         weather = APIs.GetWeather()
 
     events = ""
+    bins = None
     if showEvents:
         # get the google calendar events
         events = APIs.GetCalendar(date)
+        bins = APIs.GetBins()    
+    
 
     print(f"Drawing: {date.year}-{date.month}-{date.day} | {weather} | {'Events' if showEvents else 'no Events'}")
 
     # Draw the image
     red.DATE = date
-    red.Draw(weather, events)
+    red.Draw(weather, events, bins)
     red.image.save(os.path.join("Channels", "RedChannel.png"))
 
     black.DATE = date

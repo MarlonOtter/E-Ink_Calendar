@@ -29,6 +29,7 @@ REQUIREDFILES = [
         "APIs/secrets/OpenWeatherMap/key.json",
         "APIs/secrets/GoogleCalendar/calendars.json",
         "APIs/secrets/email.json",
+        #"APIs/secrets/bins.json", # NOTE: Not required as very location based
         "Assets/FreeSans.ttf",
         "Assets/Weather", # All the weather images in the directory
     ]
@@ -55,13 +56,15 @@ def GetData():
     pool = ThreadPool(processes=2)
     asyncWeather = pool.apply_async(APIs.GetWeather)
     asyncEvents = pool.apply_async(APIs.GetCalendar, (dt.datetime.today(),))
+    asyncBins = pool.apply_async(APIs.GetBins)
 
     events = asyncEvents.get()
     weather = asyncWeather.get()
-
-    apiData = (weather, events)
+    bins = asyncBins.get()
     
-    return weather, events
+    apiData = (weather, events, bins)
+    
+    return weather, events, bins
 
 
 # Setup and clear the display
@@ -72,9 +75,9 @@ def SetupHardware():
     epd.Clear()
 
 # Generate the Red Channel of the calendar to be displayed
-def GenerateRed(weather, events):
+def GenerateRed(weather, events, bins):
     import RedChannel as RC
-    RC.Draw(weather, events)
+    RC.Draw(weather, events, bins)
     
     return RC.image.rotate(180)
 
@@ -108,11 +111,11 @@ def Run():
 
     # Make the API calls
     start = dt.datetime.now()
-    weather, events = GetData()
+    weather, events, bins = GetData()
     print("API Requests Took: ", dt.datetime.now() - start)
 
     black = GenerateBlack(weather)
-    red = GenerateRed(weather, events)
+    red = GenerateRed(weather, events, bins)
     
 
     # Display the images on the screen

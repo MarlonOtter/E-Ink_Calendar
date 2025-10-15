@@ -38,7 +38,8 @@
         "events": {
             "padding": 7,
             "sizeX": 8,
-            "longSizeX": 24,
+            "longSizeX": 27,
+            "longSizeX_NOTE": "54 for full width of box",
             "sizeY": 8
         },
         "day": {
