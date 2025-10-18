@@ -20,7 +20,7 @@ Each of these iamges are a black and white and the display combines both images 
 ## Setup
 
 To use this, a Google project needs to be setup, using the developer dashboard. And the credentials stored
-in the folder: APIs/secrets/GoogleCalendar/
+in the folder: `APIs/secrets/GoogleCalendar/`
 
 An access token needs to be retrieved by using the API, this should be stored with the credentials.
 
@@ -45,7 +45,7 @@ NOTE: The Calendar Name is only to make it easier for users to identify each cal
 
 This tells the program what calendars it should make requests to, through the API.
 
-To make use of the weather functionality the location and API key need to be provided in APIs/secrets/OpenWeatherMap/key.json
+To make use of the weather functionality the location and API key need to be provided in `APIs/secrets/OpenWeatherMap/key.json`
 In the following format:
 
 ```json
@@ -58,7 +58,18 @@ In the following format:
 
 The latitude and longitude is your location and the key is the key that you get by setting up the openWeatherMap API
 
-To send Error Emails create a /APIs/email.json file and enter the following information:
+I have also included the ability for the program to display what bin needs to be put out for the next day. Inorder to use this `APIs/secrets/bins.json` needs to be created with this information:
+
+NOTE: I have made this feature completely optional as different locations have different websites for bin schedule so it would be very unreliable. The website may also change format so would also cause issues.
+
+```JSON
+{
+    "HouseURL" : "BIN_SCHEDULE_URL_FOR_HOUSE"
+}
+```
+
+
+To send Error Emails create a `/APIs/email.json` file and enter the following information:
 
 ```json
 {
@@ -69,7 +80,7 @@ To send Error Emails create a /APIs/email.json file and enter the following info
 }
 ```
 
-The App password can be retreived from (remove any spaces):
+The App password can be retreived from (remove any spaces from the password):
 [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
 
 This should then send an email with any important information such as:
