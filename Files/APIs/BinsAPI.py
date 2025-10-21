@@ -59,11 +59,9 @@ class Bins():
         return string
     
     def getTomorrow(self, date):
-        date = date.astimezone(dt.timezone.utc)
-        
         def getBinTomorrow(bin:list, result:str): 
             for binDate in bin:
-                dayBeforeBin = binDate.astimezone(dt.timezone.utc) + dt.timedelta(days=-1)
+                dayBeforeBin = binDate + dt.timedelta(days=-1)
                 if dayBeforeBin.date() == date.date():
                     return result 
             

@@ -170,7 +170,7 @@ def RunSimulation(date:dt.datetime, weather:str, showEvents:bool):
     result.save(os.path.join("Output", f"{date.year}-{date.month}-{date.day}_{weather}{'_noEvents'if not showEvents else ''}.png"))
 
 if __name__ == "__main__":
-    testType = input("What would you like to test:\n1 - Dates\n2 - Weather\n3 - Events\n")
+    testType = input("What would you like to test:\n1 - Dates\n2 - Weather\n3 - Events\n4 - Today\n5 - 01/01/2018 (Events Test)\n")
     match(testType):
         case "1":
             dateTestType = input("What dates would you like to test:\n1 - All this year\n2 - Data set (DateDataSet.json)\n3 - Custom\n")
@@ -202,10 +202,14 @@ if __name__ == "__main__":
             else:
                 print("USER DECLINED - Did not run the test")
 
-        case "0": 
+        case "4":
+            data = dt.datetime.today()
+            RunSimulation(data, "09d", True)
+        
+        case "5": 
             date = dt.datetime.fromisoformat("2018-01-01")
             RunSimulation(date, "09d", True)
 
 
         case _:
-            print("Invalid Input, must be 1, 2 or 3")
+            print("Invalid Input, must be 1-5")
