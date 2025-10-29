@@ -8,6 +8,7 @@ import json
 import requests
 from bs4 import BeautifulSoup as bs
 import datetime as dt
+import APIs.SendErrorEmail as errEmail
 
 APIinfo = {}
 
@@ -22,16 +23,20 @@ else:
 def getNextBinDates():
     if (not APIinfo):
         return
-    
-    r = requests.get(APIinfo["HouseURL"])
-    soup = bs(r.content, 'html.parser')
-    
-    next = soup.find_all("td", class_="next-service")
-    if (next):
-        dates = []
-        for group in next:
-            dates.append(group.contents[2])
-        return Bins(dates)
+    try:
+        r = requests.get(APIinfo["HouseURL"])
+        soup = bs(r.content, 'html.parser')
+        
+        next = soup.find_all("td", class_="next-service")
+        if (next):
+            dates = []
+            for group in next:
+                dates.append(group.contents[2])
+            return Bins(dates)
+    except Exception as e:
+        subject, body = errEmail.GenerateErrorMessage(e)
+        errEmail.sendEmail(subject, body)
+        print(e)
     return 
 
 
@@ -72,8 +77,8 @@ class Bins():
         
 if __name__ == "__main__":
     bins = getNextBinDates()
-    print(bins.getTomorrow(dt.datetime.today()))
     if (bins):
+        print(bins.getTomorrow(dt.datetime.today()))
         print(f"black: {bins.to_string(bins.black)}\ngreen: {bins.to_string(bins.green)}\nblue: {bins.to_string(bins.blue)}\nbrown: {bins.to_string(bins.brown)}\n")
     else:
         print("NO BIN DATA RECIVED")        

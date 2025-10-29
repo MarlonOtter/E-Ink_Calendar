@@ -37,6 +37,17 @@ def GenerateMessage(date:dt.datetime, weather, events, err):
     """
     return subject, body
 
+def GenerateErrorMessage(err):
+    # Email content
+    subject = "ERROR with E-ink Calendar"
+    body = f"""
+    This is an automated message that is sent when the e-ink calendar encounters an error:
+
+    The error that occured is:
+    {err}
+    """
+    return subject, body
+
 def sendEmail(subject, body):
     if not sender_email or not app_password or not receiver_email:
         return -1; 
@@ -57,13 +68,22 @@ def sendEmail(subject, body):
 
 def _cleanEventData(events):
     result = []
-    for event in events:
-        # get name, start, end
-        eventInfo = {
-            "summary": event["summary"],
-            "start": event["start"].get("date") or event["start"].get("dateTime"),
-            "end": event["end"].get("date") or event["end"].get("dateTime"),
-        }
-        result.append(eventInfo)
+    try:
+        for event in events:
+            # get name, start, end
+            eventInfo = {
+                "summary": event["summary"],
+                "start": event["start"].get("date") or event["start"].get("dateTime"),
+                "end": event["end"].get("date") or event["end"].get("dateTime"),
+            }
+            result.append(eventInfo)
+    except Exception as e:
+        return [f"Parse Error (events not in exepected format): {e}", events]
+        
     return result
 
+if __name__ == "__main__":
+    print("Generating Message")
+    subject, body = GenerateMessage(dt.datetime.today(), "09d", {"123" : "abc"}, "Test Email")
+    sendEmail(subject, body)
+    print("SENT")
