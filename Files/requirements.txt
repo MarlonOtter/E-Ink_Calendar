@@ -28,3 +28,4 @@ uritemplate==4.2.0
 urllib3==2.5.0
 waveshare-epaper; sys_platform == "linux"
 gpiozero; sys_platform == "linux"
+python-dotenv

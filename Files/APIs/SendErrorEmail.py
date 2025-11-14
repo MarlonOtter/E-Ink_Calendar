@@ -6,16 +6,6 @@ import json
 import os
 import datetime as dt
 
-path = os.path.dirname(__file__)
-
-SECRETS = ""
-with open(os.path.join(path, "secrets" ,"email.json"), "r") as f:
-    SECRETS = json.load(f)
-
-sender_email = SECRETS["senderAddr"]
-app_password = SECRETS["appPassword"]
-receiver_email = SECRETS["debugAddr"]
-
 def GenerateMessage(date:dt.datetime, weather, events, err):
     # Email content
     subject = "ERROR with E-ink Calendar"
@@ -49,20 +39,29 @@ def GenerateErrorMessage(err):
     return subject, body
 
 def sendEmail(subject, body):
-    if not sender_email or not app_password or not receiver_email:
+    EMAILS_ENABLED = os.getenv("FEATURE_EMAIL_ON_FAIL")
+    if (EMAILS_ENABLED != "ENABLED"):
+        return
+    
+    SENDER_ADDRESS = os.getenv("EMAIL_SENDER_ADDRESS")
+    APP_PASSWORD = os.getenv("EMAIL_APP_PASSWORD")
+    RECEVIER_ADDRESS = os.getenv("EMAIL_RECIEVER_ADDRESS")
+    
+    # if missing data don't send an email as it is not possible
+    if not SENDER_ADDRESS or not APP_PASSWORD or not RECEVIER_ADDRESS:
         return -1; 
     
     # Create message
     message = MIMEMultipart()
-    message["From"] = sender_email
-    message["To"] = receiver_email
+    message["From"] = SENDER_ADDRESS
+    message["To"] = RECEVIER_ADDRESS
     message["Subject"] = subject
     message.attach(MIMEText(body, "plain"))
 
     # Send email via Gmail SMTP
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(sender_email, app_password)
-        server.sendmail(sender_email, receiver_email, message.as_string())
+        server.login(SENDER_ADDRESS, APP_PASSWORD)
+        server.sendmail(SENDER_ADDRESS, RECEVIER_ADDRESS, message.as_string())
         
     return 1
 

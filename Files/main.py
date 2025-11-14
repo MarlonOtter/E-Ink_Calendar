@@ -8,6 +8,7 @@ import datetime as dt
 from multiprocessing.pool import ThreadPool
 
 import APIs.SendErrorEmail as sendErrorEmail
+import dotenv as env
 
 # Some validation so that this file can be ran on windows/devices without the display connected
 importedScreenLib = True
@@ -26,10 +27,8 @@ REQUIREDFILES = [
         "format.json",
         "APIs/secrets/GoogleCalendar/credentials.json",
         "APIs/secrets/GoogleCalendar/token.json",
-        "APIs/secrets/OpenWeatherMap/key.json",
-        "APIs/secrets/GoogleCalendar/calendars.json",
-        "APIs/secrets/email.json",
-        #"APIs/secrets/bins.json", # NOTE: Not required as very location based
+        "../.env.features",
+        "../.env",
         "Assets/FreeSans.ttf",
         "Assets/Weather", # All the weather images in the directory
     ]
@@ -103,6 +102,11 @@ def Run():
     if CheckFiles() == -1: 
         raise ImportError("Missing Files required to run program")
 
+    env.load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env.features.default"))
+    env.load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env.features"), override=True)
+    
+    env.load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+    
     pool = ThreadPool(processes=2)
 
     # Setup Hardware asynchronously as it can take a while
@@ -130,9 +134,12 @@ def Run():
 
 if __name__ == "__main__":
     start = dt.datetime.now()
+    Run()
     try:
-        Run()
+        #Run()
+        pass
     except Exception as e:
+        print(e)
         date = dt.datetime.now()
         weather = "N/A"
         events = "N/A"

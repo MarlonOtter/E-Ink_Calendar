@@ -9,5 +9,6 @@ calendars.json
 /Testing/Output
 /Testing/Channels
 .env
+.env.features
 Files/APIs/GoogleCalResponseExample.json
 /Files/venv

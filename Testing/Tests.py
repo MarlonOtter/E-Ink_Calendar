@@ -7,6 +7,7 @@ import datetime as dt
 import Simulate as sim
 import json
 import multiprocessing as mp
+import dotenv as env
 
 import os 
 import sys
@@ -135,6 +136,9 @@ def TestCustomWeather():
 def RunSimulation(date:dt.datetime, weather:str, showEvents:bool):
     sys.path.append(os.path.join(PARENT_DIR, "Files"))
 
+    env.load_dotenv(".env.features.testing")
+    env.load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+    
     # These will import as i have added the /Files folder to path
     # However IntelliSense doesn't like it
     import RedChannel as red # type: ignore

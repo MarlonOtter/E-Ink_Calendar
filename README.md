@@ -4,89 +4,51 @@ Calendar that displays the weather and upcoming events on a waveshare 7x5in E-in
 
 ## Example Output
 
-![Example Output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Combined_2024-12-24.png)
+![Example Output image](resources/Example_Combined_2024-12-24.png)
 
 As the display is an e-ink display that can only display 2 colours, I have to generate the image to be displayed in 2 seperate colour channels (seperate images).
 Each of these iamges are a black and white and the display combines both images into red, white and black
 
 ## Red Channel
 
-![Red Channel output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Red_2024-12-24.png)
+![Red Channel output image](resources/Example_Red_2024-12-24.png)
 
 ## Black Channel
 
-![Black Channel output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Black_2024-12-24.png)
+![Black Channel output image](resources/Example_Black_2024-12-24.png)
 
 ## Setup
 
-To use this, a Google project needs to be setup, using the developer dashboard. And the credentials stored
+All the Features of the Calendar are able to be enabled/disabled. By default all the features are disabled as they require API keys not part of the program by default.
+In order to enable a feature the information needs to be set in the .env (.env.example is provided)
+and then enabled in .env.features (.env.features.example is also provided).
+
+### Google Calendar Setup
+
+To use this feature, a Google project needs to be setup, using the developer dashboard. And the credentials stored
 in the folder: `APIs/secrets/GoogleCalendar/`
 
-An access token needs to be retrieved by using the API, this should be stored with the credentials.
+### Weather Setup
 
-Along with this add a new json file called calendars.json with this format to the same directory:
+To use this feature create an API key for the current weather by creating an account here: [https://home.openweathermap.org/users/sign_up](https://home.openweathermap.org/users/sign_up)
 
-```json
- {
-    "calendars" : [
-        {
-            "name" : "Holidays",
-            "id" : "CALENDAR_ID"
-        },
-        {
-            "name" : "Personal",
-            "id" : "CALENDAR_ID_2"
-        }
-    ]
- }
-```
+### Bins Setup
 
-NOTE: The Calendar Name is only to make it easier for users to identify each calendar and is not used by the program
+This is more complicated and can vary depending on location so should probably be disabled.
 
-This tells the program what calendars it should make requests to, through the API.
+### Email on fail
 
-To make use of the weather functionality the location and API key need to be provided in `APIs/secrets/OpenWeatherMap/key.json`
-In the following format:
+To use this feature, the sender email needs to be stored in the .env (address that is sending the email). and the reciever (address that is recieving the email).
 
-```json
- {
-    "lat": 0,
-    "lon": 0,
-    "key": "API_KEY"
-}
-```
-
-The latitude and longitude is your location and the key is the key that you get by setting up the openWeatherMap API
-
-I have also included the ability for the program to display what bin needs to be put out for the next day. Inorder to use this `APIs/secrets/bins.json` needs to be created with this information:
-
-NOTE: I have made this feature completely optional as different locations have different websites for bin schedule so it would be very unreliable. The website may also change format so would also cause issues.
-
-```JSON
-{
-    "HouseURL" : "BIN_SCHEDULE_URL_FOR_HOUSE"
-}
-```
-
-
-To send Error Emails create a `/APIs/email.json` file and enter the following information:
-
-```json
-{
-  "senderAddr": "SENDER_EMAIL",
-  "appPassword": "APP_PASSWORD",
-
-  "debugAddr": "RECIEVER_EMAIL"
-}
-```
-
-The App password can be retreived from (remove any spaces from the password):
+The App passord that allows the program to access the sender's google email (so it can send the message) can be retreived from here:
 [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+
+`NOTE: REMOVE ANY SPACES FROM THE PASSWORD`
 
 This should then send an email with any important information such as:
 
 - error type,
-- date
+- date (that is being ran)
 - weather code
 - important event information
 

@@ -10,21 +10,17 @@ from bs4 import BeautifulSoup as bs
 import datetime as dt
 import APIs.SendErrorEmail as errEmail
 
-APIinfo = {}
-
-secretsPath = os.path.join(os.path.dirname(__file__), "secrets", "bins.json") 
-
-if (os.path.isfile(secretsPath)):
-    with open(secretsPath, "r") as f:
-        APIinfo:json = json.load(f)
-else:
-    print("Missing Bins secret: Bins API will not be used")
-
 def getNextBinDates():
-    if (not APIinfo):
+    BINS_ENABLED = os.getenv("FEATURE_BINS")
+    if (BINS_ENABLED != "ENABLED"):
         return
+    
     try:
-        r = requests.get(APIinfo["HouseURL"])
+        HOUSE_URL = os.getenv("BINS_API_HOUSE_URL")
+        if (HOUSE_URL == None):    
+            raise ValueError("Bin collection date feature enabled however no URL to access")
+        
+        r = requests.get(HOUSE_URL)
         soup = bs(r.content, 'html.parser')
         
         next = soup.find_all("td", class_="next-service")

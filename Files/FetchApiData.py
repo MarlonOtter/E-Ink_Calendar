@@ -11,28 +11,38 @@ import datetime as dt
 import calendar as cal
 import os
 
-forcast = weather.Forcast()
-calendar = gooCal.GoogleCalendar()
+calendar = None
 
-# Load the Calendars from the external file
-with open(os.path.join(os.path.dirname(__file__), "APIs", "secrets", "GoogleCalendar", "calendars.json"), "r") as f:
-    jsonText = f.readlines()
-    jsonData = json.loads("".join(jsonText))
-    if not jsonData:
-        print("ERROR: No calendars found in calendars.json")
-        exit(1)
-    for calendarItem in jsonData["calendars"]:
-        calendar.addCalendar(calendarItem["id"])
-        
+def setupCalendar():
+    global calendar
+    # Load the Calendars from the external file
+    calendar = gooCal.GoogleCalendar()
+    if (calendar.setup == False):
+        return
+    
+    CALENDARS_LIST = os.getenv("GOOGLE_CALENDAR_CALENDARS")
+    if (CALENDARS_LIST == None):
+        raise ValueError("Calendars not defined despite calendar feature being enabled")
+    
+    calendars = CALENDARS_LIST.split("\n")
+    for cal in calendars:
+        id = cal.split(", ")
+        if (len(id) >= 2):
+            calendar.addCalendar(id[1])
+
 
 def GetWeather():
-    data = forcast.getForcast()
-
+    data = weather.GetForcast()
+    if (data == None):
+        return None
     return data[2]
 
 def GetCalendar(date):
+    if (calendar == None):
+        setupCalendar()
+    if (not calendar.setup):
+        return []
     events = calendar.Events.getWithin(dt.datetime(date.year, date.month, 1), date + dt.timedelta(days=cal.monthrange(date.year, date.month)[1]))
-    #print(events)
     return events
 
 def GetBins():
