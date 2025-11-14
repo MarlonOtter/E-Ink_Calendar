@@ -3,8 +3,6 @@
 # Author: Marlon Otter
 # Date (dd-mm-yyy): 10-07-2025
 
-
-#import libraries
 from APIs.Events import *
 import json
 
@@ -21,9 +19,16 @@ directory = os.path.join(os.path.dirname(__file__), "secrets", "GoogleCalendar")
 
 class GoogleCalendar:
     def __init__(self):
+        self.setup = False
+        
+        CALENDAR_ENABLED = os.getenv("FEATURE_GOOGLE_CALENDAR_EVENTS")
+        if (CALENDAR_ENABLED != "ENABLED"):
+            return
+        
         self.check()
         self.Events = Events(self)
         self.calendarIds = []
+        self.setup = True
 
     # Add the provided calendar to the list of calendars that will be searched
     def addCalendar(self, id):
@@ -55,16 +60,17 @@ class GoogleCalendar:
 if __name__ == "__main__":
     cal = GoogleCalendar()
     
-    #add the calendars from the calendar json list
-    with open(os.path.join(directory, "calendars.json"), "r") as f:
-        txt = f.readlines()
-        jsonData = json.loads("".join(txt))
-        if not jsonData:
-            print("No calendars found in calendars.json")
-            exit(1)
-        for calendar in jsonData["calendars"]:
-            print(f"Adding calendar: {calendar['id']}")
-            cal.addCalendar(calendar["id"])
+    #TODO GET THE .ENV
+    
+    CALENDARS_LIST = os.getenv("GOOGLE_CALENDAR_CALENDARS")
+    if (CALENDARS_LIST == None):
+        raise ValueError("Calendars not defined despite calendar feature being enabled")
+    
+    calendars = CALENDARS_LIST.split("\n")
+    for cal in calendars:
+        id = cal.split(", ")
+        if (len(id) >= 2):
+            cal.addCalendar(id[1])
             
     today = dt.datetime.today()
     start = dt.datetime(today.year, today.month, 1)
