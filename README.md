@@ -4,18 +4,18 @@ Calendar that displays the weather and upcoming events on a waveshare 7x5in E-in
 
 ## Example Output
 
-![Example Output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Combined_2024-12-24.png)
+![Example Output image](resources/Example_Combined_2024-12-24.png)
 
 As the display is an e-ink display that can only display 2 colours, I have to generate the image to be displayed in 2 seperate colour channels (seperate images).
 Each of these iamges are a black and white and the display combines both images into red, white and black
 
 ## Red Channel
 
-![Red Channel output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Red_2024-12-24.png)
+![Red Channel output image](resources/Example_Red_2024-12-24.png)
 
 ## Black Channel
 
-![Black Channel output image](https://github.com/MarlonOtter/E-Ink_Calendar/blob/main/Example_Black_2024-12-24.png)
+![Black Channel output image](resources/Example_Black_2024-12-24.png)
 
 ## Setup
 
