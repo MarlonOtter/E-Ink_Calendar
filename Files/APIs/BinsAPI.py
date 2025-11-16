@@ -63,7 +63,7 @@ class Bins():
         def getBinTomorrow(bin:list, result:str): 
             for binDate in bin:
                 dayBeforeBin = binDate + dt.timedelta(days=-1)
-                if dayBeforeBin.date() == date.date():
+                if dayBeforeBin.date() == date:
                     return result 
             
         return (getBinTomorrow(self.black, "black") or

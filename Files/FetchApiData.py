@@ -25,7 +25,10 @@ def setupCalendar():
         raise ValueError("Calendars not defined despite calendar feature being enabled")
     
     calendars = CALENDARS_LIST.split("\n")
+    
     for cal in calendars:
+        if cal == "":
+            continue
         id = cal.split(", ")
         if (len(id) >= 2):
             calendar.addCalendar(id[1])

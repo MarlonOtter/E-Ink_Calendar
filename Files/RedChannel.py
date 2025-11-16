@@ -15,7 +15,7 @@ from CalendarUtils import FORMAT, DATEFONT, CURRENT_EVENTFONT, NEXT_EVENTFONT, A
 # Define the values for drawing in RED and WHITE
 RED = 0
 WHITE = 255
-DATE = dt.datetime.today()
+DATE = dt.datetime.today().date()
 
 # define the image 
 image = Image.new("1", (800, 480), WHITE)
@@ -88,26 +88,36 @@ def AddWeather(weatherCode:str):
 def AddEventInfo(events:dict, bins):
     # Get any events that are today
     # and the next event
-    currentEvents = []
+    todayEvents = []
     nextEvent = None
+    nextEventDate = None
     # Loop through all the events
+    print(events)
     for event in events:
         # Get the start date
         eventDate = dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
         # If it is today add it to the list
-        if (eventDate.year == DATE.year) and (eventDate.month == DATE.month) and (eventDate.day == DATE.day):
-            currentEvents.append(event)
-        # if it is after today it is the next event so store that and stop looping
-        eventDate = dt.datetime(eventDate.year, eventDate.month, eventDate.day)
-        if (eventDate > DATE):
-            nextEvent = event
-            break
+        print(f"event: {event['summary']}, {eventDate}")
+        if (eventDate.date() == DATE):
+            todayEvents.append(event)
+            
+        # Go through all the events and get the next event
+        if (eventDate.date() > DATE):
+            if (nextEvent == None):
+                nextEvent = event
+                nextEventDate = eventDate
+            else:
+                #TODO: change to consider time aswell 
+                if (eventDate.date() < nextEventDate.date()):
+                    nextEvent = event
+                    nextEventDate = eventDate
+            
     
     # Draw the events that are today
     text = ""
      
     # Loop through all the events
-    for item in currentEvents:
+    for item in todayEvents:
         # Get the description
         text += f"{item['summary']} \n"
     

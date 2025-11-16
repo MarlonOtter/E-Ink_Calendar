@@ -27,8 +27,7 @@ REQUIREDFILES = [
         "format.json",
         "APIs/secrets/GoogleCalendar/credentials.json",
         "APIs/secrets/GoogleCalendar/token.json",
-        "../.env.features",
-        "../.env",
+        "../.env.features.default",
         "Assets/FreeSans.ttf",
         "Assets/Weather", # All the weather images in the directory
     ]
@@ -89,7 +88,6 @@ def GenerateBlack(weather):
 
 # Display the calendar on the screen
 def DisplayImage(red, black):
-
     epd.display(epd.getbuffer(black), epd.getbuffer(red))
 
 # Put the display to sleep
