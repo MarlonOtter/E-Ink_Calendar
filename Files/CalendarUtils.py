@@ -115,3 +115,15 @@ def _DrawCalendarBox(imageDraw, pos, boxFill:int, textFill:int, day:str):
 
 def _SameDay(a:dt.datetime, b:dt.datetime):
     return (a.year == b.year and a.month == b.month and a.day == b.day)
+
+def GetEventStartDate(event):
+    try:
+        return dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
+    except Exception as e:
+        return dt.datetime.today() + dt.timedelta(days=-31)
+
+def GetEventEndDate(event):
+    try:
+        return dt.datetime.fromisoformat(event["end"].get("date") or event["end"].get("dateTime"))
+    except Exception as e:
+        return dt.datetime.today() + dt.timedelta(days=+3)
