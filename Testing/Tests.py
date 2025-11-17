@@ -160,11 +160,11 @@ def RunSimulation(date:dt.datetime, weather:str, showEvents:bool):
     print(f"Drawing: {date.year}-{date.month}-{date.day} | {weather} | {'Events' if showEvents else 'no Events'}")
 
     # Draw the image
-    red.DATE = date
+    red.DATE = date.date()
     red.Draw(weather, events, bins)
     red.image.save(os.path.join("Channels", "RedChannel.png"))
 
-    black.DATE = date
+    black.DATE = date.date()
     black.Draw(weather)
     black.image.save(os.path.join("Channels", "BlackChannel.png"))
 

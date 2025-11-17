@@ -7,15 +7,16 @@ import MultiLineText as mlt
 
 from PIL import Image,ImageDraw
 import datetime as dt
+import dateutil as du
 import os
 
 # Import all the required constants and methods from the general file
-from CalendarUtils import FORMAT, DATEFONT, CURRENT_EVENTFONT, NEXT_EVENTFONT, ALLMONTHS, _CalendarPosition, _DrawCalendarBox, _SameDay
+from CalendarUtils import FORMAT, DATEFONT, CURRENT_EVENTFONT, NEXT_EVENTFONT, ALLMONTHS, _CalendarPosition, _DrawCalendarBox, _SameDay, GetEventEndDate, GetEventStartDate
 
 # Define the values for drawing in RED and WHITE
 RED = 0
 WHITE = 255
-DATE = dt.datetime.today()
+DATE = dt.datetime.today().date()
 
 # define the image 
 image = Image.new("1", (800, 480), WHITE)
@@ -88,26 +89,37 @@ def AddWeather(weatherCode:str):
 def AddEventInfo(events:dict, bins):
     # Get any events that are today
     # and the next event
-    currentEvents = []
+    todayEvents = []
     nextEvent = None
+    nextEventDate = None
     # Loop through all the events
     for event in events:
         # Get the start date
-        eventDate = dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
+        eventStartDate = GetEventStartDate(event)
+        eventEndDate = GetEventEndDate(event)
+        
         # If it is today add it to the list
-        if (eventDate.year == DATE.year) and (eventDate.month == DATE.month) and (eventDate.day == DATE.day):
-            currentEvents.append(event)
-        # if it is after today it is the next event so store that and stop looping
-        eventDate = dt.datetime(eventDate.year, eventDate.month, eventDate.day)
-        if (eventDate > DATE):
-            nextEvent = event
-            break
+        #print(f"event: {event['summary']}, {eventStartDate}")
+        if (eventStartDate.date() == DATE or (eventStartDate.date() < DATE and eventEndDate.date() > DATE)):
+            todayEvents.append(event)
+            
+        # Go through all the events and get the next event
+        if (eventStartDate.date() > DATE):
+            if (nextEvent == None):
+                nextEvent = event
+                nextEventDate = eventStartDate
+            else:
+                #TODO: change to consider time aswell 
+                if (eventStartDate.date() < nextEventDate.date()):
+                    nextEvent = event
+                    nextEventDate = eventStartDate
+            
     
     # Draw the events that are today
     text = ""
      
     # Loop through all the events
-    for item in currentEvents:
+    for item in todayEvents:
         # Get the description
         text += f"{item['summary']} \n"
     
@@ -170,21 +182,32 @@ def HighlightToday():
 
 def AddUpcomingEvents(events:dict):
     # loop through each event
+    monthStart = dt.date(DATE.year, DATE.month, 1)
+    monthEnd = monthStart + du.relativedelta.relativedelta(months=+1, days=-1)
     for event in events:
-        # get the date that the event starts and end
-        startDT:dt.datetime = dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
-        endDT:dt.datetime = dt.datetime.fromisoformat(event["end"].get("date") or event["end"].get("dateTime"))
-
+        startDT:dt.datetime = GetEventStartDate(event)
+        endDT:dt.datetime = GetEventEndDate(event)
+        
+        # endDT is the next day if the event is set to be all day
+        # so this fixes it so that it ends on the same day that it starts
+        # so it doesn't spread across multiple days 
         isAllDay:bool = event["start"].get("date") is not None
-
         if isAllDay: 
             endDT += dt.timedelta(days=-1)
-
-        #? I'll leave this for now but it will need to be changed 
-        # check that it is in the range that can be displayed on the calendar
-        if (startDT.month != DATE.month) or (startDT.year != DATE.year) or (startDT.year == DATE.year and startDT.month == DATE.month and startDT.day == DATE.year):
+    
+        # if event cannot be displayed
+        # stop
+        if (
+            (startDT.date() > monthEnd) or
+            (endDT.date() < monthStart)
+            ):
             continue
-
+        
+       
+        # move to the first of the month if the event starts in the previous month and ends in this or a later month
+        if ((startDT.date().month < DATE.month) or (startDT.date().year < DATE.year)):
+            startDT = dt.datetime(DATE.year, DATE.month, 1)
+            
         # calculate the position of the square that is going to be 
         # For some reason I have to -1 from the day, problably to do with 0-indexed arrays or something 
         startPos = _CalendarPosition(startDT.year, startDT.month, startDT.day-1)

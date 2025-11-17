@@ -13,7 +13,7 @@ from CalendarUtils import FORMAT, WEEKDAYFONT, ALLDAYS, REDONLY_WEATHER, _Calend
 
 BLACK = 0
 WHITE = 255
-DATE = dt.datetime.today()
+DATE = dt.datetime.today().date()
 
 # Define the image 
 image = Image.new("1", (800, 480), WHITE)

@@ -25,8 +25,19 @@ and then enabled in .env.features (.env.features.example is also provided).
 
 ### Google Calendar Setup
 
-To use this feature, a Google project needs to be setup, using the developer dashboard. And the credentials stored
-in the folder: `APIs/secrets/GoogleCalendar/`
+To use this feature, a Google project needs to be setup, using the developer dashboard. Once setup add the credentials
+to `APIs/secrets/GoogleCalendar/`
+then run the `GetGoogleCalendarToken.py` this will generate a token that will be placed alongside the credentials.
+
+`NOTE: Run run.py first then Files/Scripts/activate then get the token (this should all be in the terminal)`
+
+e.g. (For Windows)
+
+```Bash
+    python3 ./run.py
+    ./Files/venv/Scripts/activate
+    python ./GetGoogleCalendarToken.py
+```
 
 ### Weather Setup
 
