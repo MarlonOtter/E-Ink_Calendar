@@ -118,12 +118,14 @@ def _SameDay(a:dt.datetime, b:dt.datetime):
 
 def GetEventStartDate(event):
     try:
-        return dt.datetime.fromisoformat(event["start"].get("date") or event["start"].get("dateTime"))
+        isoString:str = event["start"].get("date") or event["start"].get("dateTime")
+        return dt.datetime.fromisoformat(isoString.replace("Z", "+00:00"))
     except Exception as e:
         return dt.datetime.today() + dt.timedelta(days=-31)
 
 def GetEventEndDate(event):
     try:
-        return dt.datetime.fromisoformat(event["end"].get("date") or event["end"].get("dateTime"))
+        isoString:str = event["end"].get("date") or event["end"].get("dateTime")
+        return dt.datetime.fromisoformat(isoString.replace("Z", "+00:00"))
     except Exception as e:
         return dt.datetime.today() + dt.timedelta(days=+3)
