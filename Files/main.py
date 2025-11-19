@@ -132,9 +132,8 @@ def Run():
 
 if __name__ == "__main__":
     start = dt.datetime.now()
-    Run()
     try:
-        #Run()
+        Run()
         pass
     except Exception as e:
         print(e)
