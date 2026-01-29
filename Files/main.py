@@ -77,14 +77,14 @@ def GenerateRed(weather, events, bins):
     import RedChannel as RC
     RC.Draw(weather, events, bins)
     
-    return RC.image.rotate(180)
+    return RC.image
 
 # Generate the Black Channel of the calendar to be displayed
 def GenerateBlack(weather):
     import BlackChannel as BC
     BC.Draw(weather)
     
-    return BC.image.rotate(180)
+    return BC.image
 
 # Display the calendar on the screen
 def DisplayImage(red, black):
