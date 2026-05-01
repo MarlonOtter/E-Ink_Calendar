@@ -196,7 +196,7 @@ def AddUpcomingEvents(events:dict):
             endDT += dt.timedelta(days=-1)
     
         # if event cannot be displayed
-        # stop
+        # go onto next event
         if (
             (startDT.date() > monthEnd) or
             (endDT.date() < monthStart)
@@ -236,6 +236,10 @@ def AddUpcomingEvents(events:dict):
                 mon:dt.datetime = startDT + dt.timedelta( days=-(startDT.isoweekday()-1) + week * 7)
                 monPos = _CalendarPosition(mon.year, mon.month, mon.day-1)
                 
+                # If the event goes on to the next month all that needs to be drawn has been
+                if (mon.month > DATE.month):
+                    break
+                              
                 if _SameDay(mon, endDT):
                     #print("2.1")
                     _drawEventIcon(monPos, sizeX, sizeY, padding)
