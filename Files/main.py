@@ -70,7 +70,7 @@ def SetupHardware():
     global epd
     epd = epaper.epaper('epd7in5b_V2').EPD()
     epd.init()
-    epd.Clear()
+    #epd.Clear()
 
 # Generate the Red Channel of the calendar to be displayed
 def GenerateRed(weather, events, bins):
